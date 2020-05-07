@@ -1,6 +1,7 @@
 # Write a class to hold player information, e.g. what room they are in
 # currently.
 from textwrap import wrap
+from item import get_lit
 
 
 class Player:
@@ -93,9 +94,9 @@ class Player:
         container = self.__environment()
         item = container.takeItem(itemName)
         if item:
-            self.items.append(item)
+            item.on_take(self)
         else:
-            print(f'you cannot take {itemName} from {container}')
+            print(f'you cannot take {itemName} from {container.name}')
 
     def dropItem(self, itemName):
         """
@@ -152,15 +153,56 @@ class Player:
                 try:
                     idx = int(noun)  # try reading by index number
                     i = self.items[idx]
-                    print(f"\n***{i.description}***\n")
+                    desc = "\n  ".join(wrap(f"\n***{i.description}***\n", 42))
+                    print(desc)
                 except ValueError:
                     i = self.inventory(noun)  # try reading by name
                     print(f"\n***{i}***\n")
                 except Exception:
                     print(f"I cannot understand '{cmd}'")
 
+    def has_light(self):
+        """
+        < Player > has a < LightSource >
+        """
+        return True in list(map(get_lit, self.items))
+
+
+class Monster(Player):
+    alive = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def evaluate(self, cmd):
+        """
+        < Monster > does not evaluate before proceeding
+        """
+        return False
+
+    def monst(self):
+        """
+        what does a < Monster > do ?
+        """
+        if self.alive:
+            print("Monster has its own routine")
+
+    def look(self):
+        return "use your own eyes."
+
+    def has_light(self):
+        return False
+
+    def daemon(self, run=False):
+        self.alive = run
+
 
 if __name__ == "__main__":
     print('creating a Player')
     newPlayer = Player(name="Player Test")
     print(newPlayer)
+    print(newPlayer.has_light())
+    from item import LightSource
+    light = LightSource("flashLight", "an everyday household flashlight")
+    newPlayer.items.append(light)
+    print(newPlayer.has_light())
