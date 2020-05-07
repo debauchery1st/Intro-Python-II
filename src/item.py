@@ -23,10 +23,51 @@ class Item:
     def __str__(self):
         return f'< Item: {self.name} >'
 
+    def on_take(self, *args, **kwargs):
+        try:
+            other = args[0]
+            other.items.append(self)
+        except Exception as e:
+            raise e
+        print(f"You have picked up {self.name}")
+
+    def on_drop(self, *args, **kwargs):
+        print(f"You dropped {self.name}")
+
+
+class LightSource(Item):
+    """
+    <Item> illuminates environment
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __str__(self):
+        return f"<LightSource: {self.name}"
+
+    def on_drop(self):
+        super().on_drop(self)
+        print(f"*It's not wise to drop your source of light!")
+
+
+def get_lit(kls):
+    # ? class method
+    return isinstance(kls, LightSource)
+
 
 if __name__ == "__main__":
     print('creating new item')
-    newItem = Item(
-        "laptop", "it's a thankpad C29, equipped with the latest 𝝺eFTL processor.")
-    print(newItem)
-    print(newItem.description)
+    laptop = Item(
+        "laptop",
+        "it's a thankpad C29, equipped with the latest 𝝺eFTL processor.")
+    print(laptop)
+    print(laptop.description)
+    lantern = LightSource(
+        "a lantern",
+        "a lantern's light burns brightly and illuminates the surrounding area.")
+    print(lantern)
+    print(lantern.description)
+    lantern.on_drop()
+    laptop.on_drop()
+    get_lit(laptop)
