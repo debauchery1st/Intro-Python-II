@@ -125,6 +125,12 @@ class Player:
             dropped.append(item)  # & add to our *new list
         return dropped  # finally, we return the *new list of dropped items
 
+    def has_light(self):
+        """
+        < Player > has a < LightSource >
+        """
+        return True in list(map(get_lit, self.items))
+
     def evaluate(self, cmd):
         """
         process user input
@@ -145,9 +151,9 @@ class Player:
             # double word actions
             verb, noun = actions
             v = verb.lower()
-            if v == "get":
+            if v in ["get", "take"]:
                 self.getItem(noun)
-            elif v == "drop":
+            elif v in ["drop"]:
                 self.dropItem(noun)
             elif v in ["inventory", "i"]:
                 try:
@@ -160,12 +166,6 @@ class Player:
                     print(f"\n***{i}***\n")
                 except Exception:
                     print(f"I cannot understand '{cmd}'")
-
-    def has_light(self):
-        """
-        < Player > has a < LightSource >
-        """
-        return True in list(map(get_lit, self.items))
 
 
 class Monster(Player):
